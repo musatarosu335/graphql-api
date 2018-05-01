@@ -13,6 +13,16 @@ const schema = buildSchema(`
   type Query {
     todos: [ToDo]
   }
+
+  # ToDo追加のための入力型を定義
+  input ToDoInput {
+    title: String!
+  }
+
+  # ToDo追加のMutationを定義
+  type Mutation {
+    addToDo(input: ToDoInput): ToDo
+  }
 `);
 
 let fakeDataBase = [
@@ -23,6 +33,16 @@ let fakeDataBase = [
 // リゾルバの定義
 const root = {
   todos: () => fakeDataBase,
+
+  // Mutationのリゾルバを実装
+  addToDo: ({ input }) => {
+    const todo = {
+      id: new Date().getTime().toString(),
+      title: input.title,
+    };
+    fakeDataBase.push(todo);
+    return todo;
+  },
 };
 
 const app = express();
