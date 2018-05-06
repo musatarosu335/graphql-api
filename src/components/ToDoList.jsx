@@ -1,24 +1,35 @@
 import React from 'react';
-// import ToDo from './ToDo';
+// import PropTypes from 'prop-types';
+import gql from 'graphql-tag';
+import { graphql } from 'react-apollo';
 
-export default class ToDoList extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      todoList: [ // ダミーデータ
-        { id: '1', title: 'Todo 1' },
-        { id: '2', title: 'Todo 2' },
-      ],
-    };
+// Queryを定義
+const TODOS_QUERY = gql`
+  query ToDosQuery {
+    todos {
+      id,
+      title
+    }
   }
+`;
 
-  render() {
+const ToDoList = (props) => {
+  if (props.data && props.data.loading) {
     return (
-      <div>
-        {this.state.todoList.map(todo => (
-          <p key={todo.key}>{todo.title}</p>
-        ))}
-      </div>
+      <div>Now loading...</div>
     );
   }
-}
+
+  // Queryで所得したデータの初期化
+  const todoList = props.data.todos;
+
+  return (
+    <div>
+      {todoList.map(todo => (
+        <p key={todo.key}>{todo.title}</p>
+      ))}
+    </div>
+  );
+};
+
+export default graphql(TODOS_QUERY)(ToDoList);
